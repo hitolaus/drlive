@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>DR Live TV</title>
+		<meta charset="UTF-8" />
+		<meta name="gtv-autozoom" content="off" />
+		<link rel="icon" href="images/favicon.png" type="image/png" />
+        <script type="text/javascript">
+            var _gaq = _gaq || [];
+            _gaq.push(['_setAccount', 'UA-28747965-1']);
+            _gaq.push(['_trackPageview']);
+            (function() {
+                var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+                ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+                var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+            })();
+        </script>
+		<link rel="stylesheet" href="css/main.css">
+	</head>
+<body>
+    <div id="menu_spacer"></div>
+    <div id="menu"></div>
+
+	<div id="description" style="display:none;"></div>
+
+    <div id="mediaplayer"></div>
+    
+    <script type='text/javascript' src='http://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js'></script>
+    <script type='text/javascript' src='http://documentcloud.github.com/underscore/underscore-min.js'></script>
+	<script type="text/javascript" src="js/drlive.js"></script>
+	<script type="text/javascript">
+		jwplayer("mediaplayer").setup({
+			flashplayer: "player.swf",
+		 	playlistfile: 'playlists/dr1.xml',
+		 	autostart: true,
+		 	stretching: 'fill',
+		 	height: 717,
+		 	width: 1277,
+            controlbar: 'none',
+		    'rtmp.tunneling':false
+        });
+	</script>
+</body></html>

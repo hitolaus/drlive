@@ -1,0 +1,19 @@
+{
+	"name": "drlive",
+	"title": "Boxee DR Live TV/DR NU",
+	"description": "DR Live TV and DR NU application for Boxee",
+	"author": {
+		"name": "Jakob Hilarius",
+		"url": "http://syscall.dk"
+	},
+	"version": "1.0.0",
+	"homepage": "http://udvikl.es/boxee/drlive.html",
+	"repository": {
+    	"type": "git",
+	    "url": "git://github.com/hitolaus/drlive.git"
+  	},
+	"dependencies": {},
+  	"devDependencies": {
+    	"grunt": "~0.3.9"
+  	}
+}
