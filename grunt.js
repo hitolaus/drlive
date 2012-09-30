@@ -16,6 +16,7 @@ module.exports = function(grunt) {
           'src/vendor/*.js',
           'src/title.js',
           'src/image.js',
+          'src/favorites.js',
           'src/channels.js',
           'src/date.js',
           'src/watcher.js',
@@ -63,7 +64,8 @@ module.exports = function(grunt) {
         Epg: true,
         Watcher: true,
         Player: true,
-        Title: true
+        Title: true,
+        Favorites: true
       }
     },
     uglify: {}

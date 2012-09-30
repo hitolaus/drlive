@@ -15,6 +15,6 @@ trying to build this project please make sure that Node.js is installed.
 
 The following great projects are included in this distibution.
 
-* [jwplayer][http://www.longtailvideo.com/players]
-* [Boxee API][https://github.com/boxee/boxee-js-api]
-* [jQuery Cookie][https://github.com/carhartl/jquery-cookie]
+* jwplayer (http://www.longtailvideo.com/players)
+* Boxee API (https://github.com/boxee/boxee-js-api)
+* jQuery Cookie (https://github.com/carhartl/jquery-cookie)

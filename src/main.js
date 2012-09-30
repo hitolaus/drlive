@@ -36,6 +36,7 @@ $(function () {
 	var watcher = new Watcher();
 	var epg = new Epg(watcher);
     var player = new Player();
+    var favorites = new Favorites();
 
     function setupPlayer() {
         boxee.onKeyboardKeyLeft  = function() {browser.keyPress(browser.KEY_LEFT);};
@@ -165,7 +166,7 @@ $(function () {
 			}
 			var favMark = $('<div class="favorite"><img src="images/buttons/graphic-check-54px.png" alt="" /></div>');
 			
-			if (!isFavorite(title, slug)) {
+			if (!favorites.isFavorite(title, slug)) {
 				favMark.hide();
 			}
 			video.append(favMark);
@@ -349,66 +350,18 @@ $(function () {
         return true;
     }
     
-	function toggleFavorite() {
-		var selectedVideo = $('#videos').find('.selected');
-		var videoSlugElement = selectedVideo.children('.video_slug');
-		
-        if (videoSlugElement.length === 0) {
-            return;
-        }
-        
-        var title = selectedVideo.children('.title').html();
-        var videoSlug = videoSlugElement.html();
-        
-        
-        if (isFavorite(title,videoSlug)) {
-            removeFavorite(title, videoSlug);
-            selectedVideo.find('.favorite').hide();
-        }
-        else {
-            addFavorite(title, videoSlug);
-            selectedVideo.find('.favorite').show();
-        }
-	}
-	function isFavorite(title,slug) {
-		return $.inArray(title+':::'+slug, getFavorites()) > -1;
-	}
-	function getFavorites() {
-		var favorites = $.cookie("boxee_dr_live_tv_favorites");
-		if (favorites !== null) {
-			return favorites.split(",");
-		}
-		return [];
-	}
-	function addFavorite(title, slug) {
-		var favorites = getFavorites();
-		
-		favorites.push(title+':::'+slug);
-		
-		$.cookie("boxee_dr_live_tv_favorites", favorites, { expires: 1500 });
-
-	}
-	function removeFavorite(title, slug) {
-		var favorites = getFavorites();
-		
-		var idx = favorites.indexOf(title+':::'+slug);
-		if (idx < 0) {
-			return;
-		}
-		
-		favorites.splice(idx, 1);
-		
-		$.cookie("boxee_dr_live_tv_favorites", favorites, { expires: 1500 });
-	}
-
+	
     function moveSelection(direction) {
         var active_elem = document.getElementsByClassName("active")[0];
         var active_id = -1;
         if (active_elem !== null) {
-            active_id = active_elem.id;
+            active_id = parseInt(active_elem.id, 10);
         }
-        if ((active_id === 0 && direction < 0) || (active_id === playlists.length-1 && direction > 0)) {return;}
-		var next_id = parseInt(active_id, 10) + parseInt(direction, 10);
+        
+        if ((active_id === 0 && direction < 0) || (active_id === playlists.length-1 && direction > 0)) {
+            return;
+        }
+		var next_id = active_id + direction;
 
         setActiveMenuElement(next_id);
     }
@@ -639,7 +592,7 @@ $(function () {
             hideVideosMenu();
         }
         else if ($('#videos').is(":visible")) {
-            toggleFavorite();
+            favorites.toggleFavorite();
         }
         else if ($('#menu').is(":visible")) {
             moveSelection(1);
