@@ -1,11 +1,12 @@
 # Introduction
 
-The is an web application for viewing [DR][http://dr.dk/tv] live TV and archieve programs.
+The is an web application for viewing DR (http://dr.dk/tv) live TV and archieve programs.
 
 # Build Instructions
 
-This project uses [Grunt][http://gruntjs.com] as build system which requires Node.js. So before
-trying to build this project please make sure that Node.js is installed.
+This project uses Grunt (http://gruntjs.com) as build system which requires Node.js. So before
+trying to build this project please make sure that Node.js is installed. To run the tests you
+also need PhantomJS (http://phantomjs.org/).
 
     $ git clone git://githus.com/hitolaus/drlive.git
     $ cd drlive && npm install

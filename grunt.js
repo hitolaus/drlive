@@ -34,7 +34,10 @@ module.exports = function(grunt) {
       }
     },
     lint: {
-      files: ['grunt.js', 'src/*.js', 'test/**/*.js']
+      files: ['grunt.js', 'src/*.js', 'test/*.js']
+    },
+    qunit: {
+      files: ['test/index.html']
     },
     jshint: {
       options: {
@@ -51,7 +54,6 @@ module.exports = function(grunt) {
         browser: true
       },
       globals: {
-        jQuery: true,
         $: true,
         jwplayer: true,
         console: true,
@@ -72,6 +74,6 @@ module.exports = function(grunt) {
   });
 
   // Default task.
-  grunt.registerTask('default', 'lint concat min');
+  grunt.registerTask('default', 'lint concat qunit min');
 
 };

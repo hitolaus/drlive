@@ -2,3 +2,4 @@ node_modules
 .DS_Store
 dist/api/cache
 dist/js/drlive.js
+dist/js/drlive.min.js
