@@ -4,8 +4,15 @@ function Image() {
 
  // Load image offscreen and replace placeholder
 Image.prototype.load = function (node) {
-	var images = node.find('img');
-	
+	var images = [];
+
+	if (node.is('img')) {
+		images = [ node ];
+	}
+	else {
+		images = node.find('img');	
+	}
+
     var errorReset = function() {
         $(this).error(function() {});
         $(this).attr("src", placeholder);

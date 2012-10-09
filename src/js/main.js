@@ -1,5 +1,5 @@
 // Setup globals for all AJAX requests
-$.ajaxSetup({ timeout: 5000 });
+$.ajaxSetup({ timeout: 10000 });
     
 var playlists = ["dr1","dr2","ramasjang","drk","drupdate","drhd"];
     
@@ -26,10 +26,6 @@ $(function () {
     // The channel selected in the EPG
     var activeIdx = currentChannelIdx;
 
-    // Index for navigating videos
-    // TODO: Remove
-    var currentVideoBeginIdx = 0;
-
     var lastSearchTerm = "";
 
     var WATCHING_INTERVAL_IN_MILLIS = 30000;
@@ -38,7 +34,7 @@ $(function () {
 	var epg = new Epg(watcher);
     var player = new Player();
     var favorites = new Favorites();
-    var vod = new VOD(favorites);
+    var vod = new VOD(player, favorites);
 
     function setupPlayer() {
         boxee.onKeyboardKeyLeft  = function() {browser.keyPress(browser.KEY_LEFT);};
@@ -65,37 +61,6 @@ $(function () {
         }
         epg.getActiveShow(currentChannelIdx, search);
     }
-
-	function searchFreetext() {
-		var selectedElement = $('#search .search_elem.selected');
-	
-		var term = selectedElement.val();
-		if (selectedElement.is("div")) {
-			term = selectedElement.html();
-		}
-	
-		if ($.trim(term) === "") {
-			return;
-		}
-		
-		var prevSearches = $.cookie("boxee_dr_live_tv_prev_search");
-		if (prevSearches === null || prevSearches === "") {
-			prevSearches = [];
-		}
-		else {
-			prevSearches = prevSearches.split(",");
-		}
-		var newLength = prevSearches.unshift(term);
-		while (newLength > 4) {
-			prevSearches.pop();
-			newLength = prevSearches.length;
-		}
-		
-		$.cookie("boxee_dr_live_tv_prev_search", prevSearches, { expires: 365 });
-
-        hideSearch();
-		search(term);
-	}
 
     function search(term) {
         //$.get('api/search.php?term=' + encodeURIComponent(term), function(data) {
@@ -137,51 +102,6 @@ $(function () {
 	}
 	function hideSearch() {
 		$('#search').remove();
-	}
-
-    function showVideos() {
-        $('#video_menu_inactive').show();
-    }
-    function hideVideos() {
-        hideVideosMenu(true);
-        $('#video_menu_inactive').hide();
-        $('#videos_spacer').hide();
-        $('#videos').hide();
-        currentVideoBeginIdx = 0;
-    }
-
-	function showVideosMenu() {
-        $('#video_menu_inactive').hide();
-        // Remove the selected element in the video selection menu, since we are selection content in another menu
-		$('#videos').find('.video').removeClass('selected');
-	
-		if ($('#videos_menu').length === 0) {
-			var menu = $('<div id="videos_menu"></div>');
-			
-			//menu.append('<div class="menu selected"><img src="images/buttons/icon_whatsnew.png" alt="Nyeste" /><span>Nyeste</span><div style="display:none;" class="cmd">newest</div></div>');
-			menu.append('<div class="menu selected"><span class="icon new"></span><span class="title">Nyeste</span><div style="display:none;" class="cmd">newest</div></div>');
-			menu.append('<div class="menu"><span class="icon popular"></span><span class="title">Mest Populære</span><div style="display:none;" class="cmd">mostviewed</div></div>');
-			menu.append('<div class="menu"><span class="icon favorite"></span><span class="title">Favoritter</span><div style="display:none;" class="cmd">favorites</div></div>');
-			menu.append('<div class="menu"><span class="icon all"></span><span class="title">Alle Programmer</span><div style="display:none;" class="cmd">programs</div></div>');
-		
-			$('body').append(menu);
-		}
-		else {
-			$('#videos_menu').show();
-		}
-	}
-	function hideVideosMenu(reset) {
-		reset = typeof reset !== 'undefined' ? reset : false;
-
-		if (reset) {
-			$('#videos_menu').remove();
-		}
-		else {
-			// When we only hide the element the selected menu is remembered
-			$('#videos_menu').hide();
-		}
-		
-		$('#video_menu_inactive').show();
 	}
 
     function showGuide() {
@@ -245,22 +165,6 @@ $(function () {
             'idx': idx
         });
     }
-    function playVideo() {
-        var selectedVideo = $('#videos').find('.selected');
-        var videoIdElement = selectedVideo.children('.video_id');
-        if (videoIdElement.length === 0) {
-            var videoSlugElement = selectedVideo.children('.video_slug');
-            var videoSlug = videoSlugElement.html();
-
-            vod.load("programs.php/"+videoSlug+"/videos");
-            return false;
-        }
-        
-        var videoId = videoIdElement.html();
-        
-        player.play({videoId: videoId });
-        return true;
-    }
     
 	
     function moveSelection(direction) {
@@ -276,100 +180,6 @@ $(function () {
 		var next_id = active_id + direction;
 
         setActiveMenuElement(next_id);
-    }
-
-    function moveVideoSelection(direction) {
-        var videos = $('#videos').children();
-        for (var i = 0; i < videos.length; i++) {
-            var video = $(videos[i]);
-            
-            if (video.hasClass('selected')) {
-                if (i === 0 && direction < 0) {
-                    return;
-                }
-                if (i+direction >= videos.length) {
-                    return;
-                }
-
-                // Check if we move out of the view block to the right
-                if (i >= currentVideoBeginIdx + 4 && direction > 0) {
-                    $(videos[currentVideoBeginIdx]).hide();
-                    $(videos[i+1]).show();
-                    new Image().load($(videos[i+1]));
-                    currentVideoBeginIdx++;
-                }
-                // Check if we move out of the view block to the left
-                if (i <= currentVideoBeginIdx && direction < 0) {
-                    $(videos[i-1]).show();
-                    $(videos[currentVideoBeginIdx+4]).hide();
-                    currentVideoBeginIdx--;
-                }
-
-                // Set the new selected element
-                video.removeClass('selected');
-                $(videos[i+direction]).addClass('selected');
-                break;
-            }
-        }
-        // Select the first element if none are selected
-        if ($('#videos').find('.selected').length === 0 && videos.length > 0) {
-            $(videos[0]).addClass('selected');
-        }
-    }
-
-	function moveVideoMenuSelection(direction) {
-        var videos = $('#videos_menu').children();
-        for (var i = 0; i < videos.length; i++) {
-            var video = $(videos[i]);
-            
-            if (video.hasClass('selected')) {
-                if (i === 0 && direction < 0) {
-                    return;
-                }
-                if (i+direction >= videos.length) {
-                    return;
-                }
-
-                // Set the new selected element
-                video.removeClass('selected');
-                $(videos[i+direction]).addClass('selected');
-                break;
-            }
-        }
-    }
-
-	function moveSearchSelection(direction) {
-        var videos = $('#search .search_elem');
-        for (var i = 0; i < videos.length; i++) {
-            var video = $(videos[i]);
-            
-            if (video.hasClass('selected')) {
-                if (i === 0 && direction < 0) {
-                    return;
-                }
-                if (i+direction >= videos.length) {
-                    return;
-                }
-
-                // Check if we move out of the view block to the right
-                if (i >= currentVideoBeginIdx + 4 && direction > 0) {
-                    $(videos[currentVideoBeginIdx]).hide();
-                    $(videos[i+1]).show();
-                    currentVideoBeginIdx++;
-                }
-                // Check if we move out of the view block to the left
-                if (i <= currentVideoBeginIdx && direction < 0) {
-                    $(videos[i-1]).show();
-                    $(videos[currentVideoBeginIdx+4]).hide();
-                    currentVideoBeginIdx--;
-                }
-
-                // Set the new selected element
-                video.removeClass('selected');
-                $(videos[i+direction]).addClass('selected');
-                break;
-            }
-        }
     }
 
     function setActiveMenuElement(idx) {
@@ -388,24 +198,14 @@ $(function () {
             hideInfo();
             hideClock();
         }
-        else if ($('#videos_menu').is(":visible")) {
-            vod.load();
-            hideVideosMenu();
-        }
         else if ($('#videos').is(":visible")) {
-            var playing = playVideo();
-            if (playing) {
-                hideVideos();
-            }
+            vod.enter();
         }
         else if ($('#menu').is(":visible")) {
             changeChannel();
 
             hideGuide();
             hideClock();
-        }
-        else if ($('#search').is(":visible")) {
-			searchFreetext();
         }
         else {
             showGuide();
@@ -423,11 +223,7 @@ $(function () {
             hideClock();
         }
         else if ($('#videos').is(":visible")) {
-            //hideVideos();
             vod.hide();
-        }
-        else if ($('#search').is(":visible")) {
-            hideSearch();
         }
         else {
             dialog.showQuitDialog();
@@ -438,17 +234,13 @@ $(function () {
     function onRight() {
         if ($('#description').is(':visible')) {
         }
-        else if ($('#videos_menu').is(":visible")) {
-            moveVideoMenuSelection(1);
-        }
         else if ($('#videos').is(":visible")) {
-            moveVideoSelection(1);
+            vod.right();
         }
         else if ($('#menu').is(":visible")) {
             showInfo();
             showClock();
         }
-        else if ($('#search').is(":visible")) {}
         else {
             player.next();
         }
@@ -459,16 +251,12 @@ $(function () {
             showGuide();
             showClock();
         }
-        else if ($('#videos_menu').is(":visible")) {
-            moveVideoMenuSelection(-1);
-        }
         else if ($('#videos').is(":visible")) {
-            moveVideoSelection(-1);
+            vod.left();
         }
         else if ($('#menu').is(":visible")) {
 
         }
-        else if ($('#search').is(":visible")) {}
         else {
             player.previous();
         }
@@ -480,13 +268,10 @@ $(function () {
             hideClock();
         }
         else if ($('#videos').is(":visible")) {
-            showVideosMenu();
+            vod.up();
         }
         else if ($('#menu').is(":visible")) {
             moveSelection(-1);
-        }
-        else if ($('#search').is(":visible")) {
-            moveSearchSelection(-1);
         }
         else {
             setActiveMenuElement(currentChannelIdx);
@@ -501,17 +286,11 @@ $(function () {
             hideInfo();
             hideClock();
         }
-		else if ($('#videos_menu').is(":visible")) {
-            hideVideosMenu();
-        }
         else if ($('#videos').is(":visible")) {
-            favorites.toggleFavorite();
+            vod.down();
         }
         else if ($('#menu').is(":visible")) {
             moveSelection(1);
-        }
-        else if ($('#search').is(":visible")) {
-            moveSearchSelection(1);
         }
         else {
             searchForActiveShow();

@@ -41,10 +41,10 @@ module.exports = function(grunt) {
       }
     },
     lint: {
-      files: ['grunt.js', 'src/*.js', 'test/*.js']
+      files: ['grunt.js', 'src/js/*.js', 'test/*.js']
     },
     qunit: {
-      files: ['test/index.html']
+      files: ['test/*.html']
     },
     jshint: {
       options: {
