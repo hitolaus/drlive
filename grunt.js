@@ -13,18 +13,25 @@ module.exports = function(grunt) {
       dist: {
         src: [
           '<banner:meta.banner>',
-          'src/vendor/*.js',
-          'src/title.js',
-          'src/image.js',
-          'src/favorites.js',
-          'src/channels.js',
-          'src/date.js',
-          'src/watcher.js',
-          'src/epg.js',
-          'src/player.js',
-          'src/main.js'
+          'src/js/vendor/*.js',
+          'src/js/title.js',
+          'src/js/image.js',
+          'src/js/favorites.js',
+          'src/js/channels.js',
+          'src/js/date.js',
+          'src/js/watcher.js',
+          'src/js/epg.js',
+          'src/js/vod.js',
+          'src/js/player.js',
+          'src/js/main.js'
         ],
         dest: 'dist/js/<%= pkg.name %>.js'
+      },
+      css: {
+        src: [
+          'src/css/*.css'
+        ],
+        dest: 'dist/css/main.css'
       }
     },
     min: {
@@ -67,7 +74,8 @@ module.exports = function(grunt) {
         Watcher: true,
         Player: true,
         Title: true,
-        Favorites: true
+        Favorites: true,
+        VOD: true
       }
     },
     uglify: {}

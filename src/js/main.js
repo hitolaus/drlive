@@ -27,6 +27,7 @@ $(function () {
     var activeIdx = currentChannelIdx;
 
     // Index for navigating videos
+    // TODO: Remove
     var currentVideoBeginIdx = 0;
 
     var lastSearchTerm = "";
@@ -37,6 +38,7 @@ $(function () {
 	var epg = new Epg(watcher);
     var player = new Player();
     var favorites = new Favorites();
+    var vod = new VOD(favorites);
 
     function setupPlayer() {
         boxee.onKeyboardKeyLeft  = function() {browser.keyPress(browser.KEY_LEFT);};
@@ -101,100 +103,10 @@ $(function () {
         $.getJSON('http://www.dr.dk/nu/api/search/' + encodedSearchTerm + "?callback=?", function(data) {
             lastSearchTerm = term;
             
-            buildVideos(data);
+            //buildVideos(data);
+            vod.build(data);
         });
     }
-
-    function loadActiveVideos(path) {
-        var api = "";
-
-        if (path === undefined) {
-			var selectedVideo = $('#videos_menu').find('.selected');
-			var cmdElement = selectedVideo.children('.cmd');
-			if (cmdElement === null || cmdElement.length === 0) {
-				return;
-			}
-		
-			var cmd = cmdElement.html();
-			
-			api = 'api/'+cmd+'.php?ts='+new Date().getTime();
-		}
-		else {
-			api = 'api/' + path + '?ts='+new Date().getTime();
-		}
-    
-        $.get(api, function(data) {            
-            buildVideos(data);
-        });
-    }
-
-	function buildVideos(data) {
-        currentVideoBeginIdx = 0;
-
-        $('#video_menu_inactive').remove();
-		$('#videos').remove();
-        $('#videos_spacer').remove();
-
-        var videos = $('<div id="videos" />');
-
-        if (data.length === 0) {
-            videos.append('<div class="error">Ingen videoer fundet</div>');
-        }
-			
-        for (var i = 0; i < data.length; i++) {
-            var r = data[i];
-            
-            var video = $('<div class="video" />');
-            if (i === 0) {
-                video.addClass("selected");
-            }
-            
-            var title = r.title;
-            var slug = null;
-            
-            var thumb = null;
-            
-            if (r.id === undefined) {
-                thumb = $('<div class="thumb"><img src="images/default_video.png" data-src="api/imageproxy.php/programseries/'+r.slug+'/images/200x150.jpg" alt="" /></div>');
-
-                slug = r.slug;
-            }
-            else {
-                thumb = $('<div class="thumb"><img src="images/default_video.png" data-src="api/imageproxy.php/videos/'+r.id+'/images/200x150.jpg" alt="" /></div>');
-
-                slug = r.programSerieSlug;
-			}
-			var favMark = $('<div class="favorite"><img src="images/buttons/graphic-check-54px.png" alt="" /></div>');
-			
-			if (!favorites.isFavorite(title, slug)) {
-				favMark.hide();
-			}
-			video.append(favMark);
-			video.append(thumb);
-			video.append('<div class="title">'+r.title+'</div>');
-			if (r.id !== undefined) {
-				video.append('<div style="display:none;" class="video_id">'+r.id+'</div>');
-			}
-			video.append('<div style="display:none;" class="video_slug">'+slug+'</div>');
-            //video.append('<div style="display:none;" class="description">' + r.description + '</div>');
-
-			if (i > 4) {
-                video.hide();
-            }
-            else {
-                // Load visible thumbs
-                new Image().load(thumb);
-            }
-
-            videos.append(video);
-        }
-
-		$('body').append('<div id="video_menu_inactive">Press Up for Menu</div>');
-        $('body').append(videos);
-        $('body').append('<div id="videos_spacer" />');
-        
-        showVideos();
-	}
 
     function updateClock() {
         var now = new Date();
@@ -340,7 +252,7 @@ $(function () {
             var videoSlugElement = selectedVideo.children('.video_slug');
             var videoSlug = videoSlugElement.html();
 
-            loadActiveVideos("programs.php/"+videoSlug+"/videos");
+            vod.load("programs.php/"+videoSlug+"/videos");
             return false;
         }
         
@@ -477,7 +389,7 @@ $(function () {
             hideClock();
         }
         else if ($('#videos_menu').is(":visible")) {
-            loadActiveVideos();
+            vod.load();
             hideVideosMenu();
         }
         else if ($('#videos').is(":visible")) {
@@ -511,7 +423,8 @@ $(function () {
             hideClock();
         }
         else if ($('#videos').is(":visible")) {
-            hideVideos();
+            //hideVideos();
+            vod.hide();
         }
         else if ($('#search').is(":visible")) {
             hideSearch();
@@ -633,9 +546,9 @@ $(function () {
         }
     });
 
-    /* *********************************************
-     * INIT
-     * ********************************************* */
+    // *********************************************
+    // INIT
+    // *********************************************
     showGuide();
     showClock();
     
