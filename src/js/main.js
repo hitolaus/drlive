@@ -25,9 +25,7 @@ $(function () {
     // TODO: Move to Player
     var currentChannelIdx = 0;
     // The channel selected in the EPG
-    var activeIdx = currentChannelIdx;
-
-    var WATCHING_INTERVAL_IN_MILLIS = 30000;
+    var activeIdx = 0;
 
 	var clock = new Clock();
 	var watcher = new Watcher();
@@ -49,11 +47,6 @@ $(function () {
     boxee.exec(setupPlayer);
     // Execute in Control Context (see http://developer.boxee.tv/Control_Script_Context)
     boxee.exec("setupPlayer()");
-
-	// TODO: Move to player
-    function watchingPing() {
-        watcher.watching(currentChannelIdx);
-    }
 
     function showGuide() {
         setActiveMenuElement(currentChannelIdx);
@@ -87,20 +80,13 @@ $(function () {
             return;
         }
 
-        if (watchingTimer != null) {
-            clearInterval(watchingTimer);
-        }
-
-
         var activeElement = $('.active')[0];
         var idx = activeElement.id;
         
 
         currentChannelIdx = idx;
 
-        setInterval(watchingPing, WATCHING_INTERVAL_IN_MILLIS);
-        
-        var channel = playlists[idx];
+        var channel = new Channels().getCleanName(idx);//playlists[idx];
         
         player.play({
             'channel': channel, 
@@ -112,7 +98,7 @@ $(function () {
     function moveSelection(direction) {
         var active_elem = document.getElementsByClassName("active")[0];
         var active_id = -1;
-        if (active_elem !== null) {
+        if (active_elem) {
             active_id = parseInt(active_elem.id, 10);
         }
         
@@ -273,8 +259,4 @@ $(function () {
     // *********************************************
     showGuide();
     clock.show();
-    
-    // TODO: Move to Player
-    watchingPing(); // Start the watching timer right away
-    var watchingTimer = setInterval(watchingPing, WATCHING_INTERVAL_IN_MILLIS);
 });
