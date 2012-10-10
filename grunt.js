@@ -35,12 +35,6 @@ module.exports = function(grunt) {
         dest: 'dist/css/main.css'
       }
     },
-    min: {
-      dist: {
-        src: ['<banner:meta.banner>', '<config:concat.dist.dest>'],
-        dest: 'dist/js/<%= pkg.name %>.min.js'
-      }
-    },
     lint: {
       files: ['grunt.js', 'src/js/*.js', 'test/*.js']
     },
