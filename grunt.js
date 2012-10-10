@@ -15,6 +15,7 @@ module.exports = function(grunt) {
           '<banner:meta.banner>',
           'src/js/vendor/*.js',
           'src/js/title.js',
+          'src/js/clock.js',
           'src/js/image.js',
           'src/js/favorites.js',
           'src/js/channels.js',
@@ -75,7 +76,8 @@ module.exports = function(grunt) {
         Player: true,
         Title: true,
         Favorites: true,
-        VOD: true
+        VOD: true,
+        Clock:true
       }
     },
     uglify: {}

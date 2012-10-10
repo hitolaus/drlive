@@ -3,16 +3,33 @@
  *
  * @author Jakob Hilarius, http://syscall.dk
  */
-function Player() {
+function Player(watcher) {
     
     this.activeItem = {
         'type': 'channel',
-        'idx': 0,
         'channel': 'dr1'
     };
-    this.state = {};
+    this.state = {
+        'currentChannelIdx': 0
+    };
 }
 
+/**
+ * Plays a video item or channel.
+ * Video:
+ * <code>
+ *  {
+ *    videoId: 1234
+ *  }
+ * </code>
+ * Channel:
+ * <code>
+ *  {
+ *    channel: "dr1",
+ *    idx: 0
+ *  }
+ * </code>
+ */
 Player.prototype.play = function(item) {
     if (item.videoId !== undefined) {
         var scope = this;
@@ -29,10 +46,10 @@ Player.prototype.play = function(item) {
             currentVodEndTime.setHours(currentVodStartTime.getHours() + parseInt(durationComponents[0], 10));
             currentVodEndTime.setMinutes(currentVodStartTime.getMinutes() + parseInt(durationComponents[1], 10));
             currentVodEndTime.setSeconds(currentVodStartTime.getSeconds() + parseInt(durationComponents[2], 10)); 
-        
-            // Register title as search term which allows "search for active show"
-            scope.state.lastSearchTerm = new Title(data.title).getName();
-        
+
+            // We are no longer viewing any channel
+            scope.state.currentChannelIdx = -1;
+
             scope.activeItem = {
                 'type': 'video',
                 'file': file,
@@ -44,8 +61,6 @@ Player.prototype.play = function(item) {
                 'icon': ''
             };
 
-            // We are no longer viewing any channel
-            scope.state.currentChannelIdx = -1;
 
             jwplayer().load({ file: scope.activeItem.file, streamer: scope.activeItem.streamer, provider:"rtmp" });
         }).error(function () { console.log('ERROR'); });
@@ -56,8 +71,9 @@ Player.prototype.play = function(item) {
         var channel = item.channel;
 
         this.activeItem.channel = channel;
-        this.activeItem.idx = item.idx;
         this.activeItem.type = 'channel';
+
+        this.state.currentChannelIdx = item.idx;
 
         jwplayer().load("playlists/" + channel + ".xml");
 	}
@@ -80,7 +96,7 @@ Player.prototype.getItem = function(callback) {
         var ts = new Date().getTime();
         $.getJSON('http://www.dr.dk/nu/api/nownext?ts=' + ts + "&callback=?", function (data) {
             var channelId = scope.activeItem.channel;
-            var idx = scope.activeItem.idx;
+            var idx = scope.state.currentChannelIdx;
 
             var channel = data.channels[idx];
             

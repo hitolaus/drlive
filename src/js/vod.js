@@ -126,7 +126,7 @@ function VOD(player, favorites) {
 		$('body').append(videos);
 		
 		setTimeout(function() {
-			scope.show();
+			$('#videos').css('top', '0');
 		}, 0);
 	};
 
@@ -226,6 +226,13 @@ function VOD(player, favorites) {
         }
     }
 
+    function search(term) {
+        var encodedSearchTerm = encodeURIComponent(term).replace(/\+/g, '%20');
+        $.getJSON('http://www.dr.dk/nu/api/search/' + encodedSearchTerm + "?callback=?", function(data) {
+            scope.build(data);
+        });
+    }
+
 	// ************************************************
 	// Visibility
 	// ************************************************
@@ -242,8 +249,17 @@ function VOD(player, favorites) {
         currentPaginationIdx = 0;
 	};
 
+/*
 	this.show = function () {
-		$('#videos').css('top', '0');
+		$('#videos').css('top', '0');	
+	};
+*/
+
+	this.show = function () {
+		player.getItem(function(item) {
+			var title = new Title(item.title).getName();
+			search(title);
+		});
 	};
 
 	// ************************************************

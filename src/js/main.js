@@ -1,6 +1,7 @@
 // Setup globals for all AJAX requests
 $.ajaxSetup({ timeout: 10000 });
-    
+
+// TODO: Remove
 var playlists = ["dr1","dr2","ramasjang","drk","drupdate","drhd"];
     
 var dialog = {
@@ -26,13 +27,12 @@ $(function () {
     // The channel selected in the EPG
     var activeIdx = currentChannelIdx;
 
-    var lastSearchTerm = "";
-
     var WATCHING_INTERVAL_IN_MILLIS = 30000;
 
+	var clock = new Clock();
 	var watcher = new Watcher();
 	var epg = new Epg(watcher);
-    var player = new Player();
+    var player = new Player(watcher);
     var favorites = new Favorites();
     var vod = new VOD(player, favorites);
 
@@ -50,59 +50,10 @@ $(function () {
     // Execute in Control Context (see http://developer.boxee.tv/Control_Script_Context)
     boxee.exec("setupPlayer()");
 
+	// TODO: Move to player
     function watchingPing() {
         watcher.watching(currentChannelIdx);
     }
-
-    function searchForActiveShow() {
-        if (currentChannelIdx < 0) {
-            search(lastSearchTerm);
-            return;
-        }
-        epg.getActiveShow(currentChannelIdx, search);
-    }
-
-    function search(term) {
-        //$.get('api/search.php?term=' + encodeURIComponent(term), function(data) {
-        var encodedSearchTerm = encodeURIComponent(term).replace(/\+/g, '%20');
-        $.getJSON('http://www.dr.dk/nu/api/search/' + encodedSearchTerm + "?callback=?", function(data) {
-            lastSearchTerm = term;
-            
-            //buildVideos(data);
-            vod.build(data);
-        });
-    }
-
-    function updateClock() {
-        var now = new Date();
-
-        $('#clock').remove();
-        
-        $('body').append('<div id="clock"></div>');
-        
-        $('#clock').append('<span class="icon clock"></span>');
-        $('#clock').append(now.getFormattedTime());
-    }
-
-	function showSearch() {
-
-		$('body').append('<div id="search"><input name="search_field" id="search_field" class="search_elem selected" /></div>');
-
-		$('#search_field').focus();
-
-		$('#search').append('<hr/>');
-		
-		var prevSearchQueries = $.cookie("boxee_dr_live_tv_prev_search");
-		if (prevSearchQueries != null) {
-			prevSearchQueries = prevSearchQueries.split(",");
-			for(var i = 0; i < prevSearchQueries.length && i < 4; i++) {
-				$('#search').append('<div class="search_elem prev_search">'+prevSearchQueries[i]+'</div>');
-			}
-		}
-	}
-	function hideSearch() {
-		$('#search').remove();
-	}
 
     function showGuide() {
         setActiveMenuElement(currentChannelIdx);
@@ -128,15 +79,6 @@ $(function () {
     }
     function hideInfo() {
         $('#description').hide();
-    }
-
-    function showClock() {
-        updateClock();
-
-        $('#clock').show();
-    }
-    function hideClock() {
-        $('#clock').hide();
     }
 
     function changeChannel() {
@@ -196,7 +138,7 @@ $(function () {
     function onEnter() {
         if ($('#description').is(":visible")) {
             hideInfo();
-            hideClock();
+            clock.hide();
         }
         else if ($('#videos').is(":visible")) {
             vod.enter();
@@ -205,22 +147,22 @@ $(function () {
             changeChannel();
 
             hideGuide();
-            hideClock();
+            clock.hide();
         }
         else {
             showGuide();
-            showClock();
+            clock.show();
         }
     }
 
     function onBack() {
         if ($('#description').is(":visible")) {
             hideInfo();
-            hideClock();
+            clock.hide();
         }
         else if ($('#menu').is(":visible")) {
             hideGuide();
-            hideClock();
+            clock.hide();
         }
         else if ($('#videos').is(":visible")) {
             vod.hide();
@@ -239,7 +181,7 @@ $(function () {
         }
         else if ($('#menu').is(":visible")) {
             showInfo();
-            showClock();
+            clock.show();
         }
         else {
             player.next();
@@ -249,7 +191,7 @@ $(function () {
     function onLeft() {
         if ($('#description').is(':visible')) {
             showGuide();
-            showClock();
+            clock.show();
         }
         else if ($('#videos').is(":visible")) {
             vod.left();
@@ -265,7 +207,7 @@ $(function () {
     function onUp() {
         if ($('#description').is(":visible")) {
             hideInfo();
-            hideClock();
+            clock.hide();
         }
         else if ($('#videos').is(":visible")) {
             vod.up();
@@ -277,14 +219,14 @@ $(function () {
             setActiveMenuElement(currentChannelIdx);
             
             showInfo();
-            showClock();
+            clock.show();
         }
     }
 
     function onDown() {
         if ($('#description').is(":visible")) {
             hideInfo();
-            hideClock();
+            clock.hide();
         }
         else if ($('#videos').is(":visible")) {
             vod.down();
@@ -293,7 +235,8 @@ $(function () {
             moveSelection(1);
         }
         else {
-            searchForActiveShow();
+            //searchForActiveShow();
+            vod.show();
         }
     }
 
@@ -329,7 +272,7 @@ $(function () {
     // INIT
     // *********************************************
     showGuide();
-    showClock();
+    clock.show();
     
     // TODO: Move to Player
     watchingPing(); // Start the watching timer right away
