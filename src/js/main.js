@@ -1,8 +1,5 @@
 // Setup globals for all AJAX requests
 $.ajaxSetup({ timeout: 10000 });
-
-// TODO: Remove
-var playlists = ["dr1","dr2","ramasjang","drk","drupdate","drhd"];
     
 var dialog = {
   showQuitDialog: function() {
@@ -20,6 +17,8 @@ if (!window.console) {
 
 $(function () {
     boxeeAPI.keyboardMode();
+
+    var channels = new Channels();
 
 	// The channel we are currently viewing
     // TODO: Move to Player
@@ -86,7 +85,7 @@ $(function () {
 
         currentChannelIdx = idx;
 
-        var channel = new Channels().getCleanName(idx);//playlists[idx];
+        var channel = channels.getCleanName(idx);
         
         player.play({
             'channel': channel, 
@@ -102,7 +101,7 @@ $(function () {
             active_id = parseInt(active_elem.id, 10);
         }
         
-        if ((active_id === 0 && direction < 0) || (active_id === playlists.length-1 && direction > 0)) {
+        if ((active_id === 0 && direction < 0) || (active_id === channels.size()-1 && direction > 0)) {
             return;
         }
 		var next_id = active_id + direction;
