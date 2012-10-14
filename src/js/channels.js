@@ -6,7 +6,7 @@ function Channels() {
 	};
 
 	this.size = function () {
-		return channels.lenght;
+		return channels.length;
 	};
 
 }

@@ -52,6 +52,8 @@ $(function () {
 
         hideInfo();
 
+        // TODO: This doesn't working correctly when coming from VOD since currentChannelIdx
+        // is set in the Player
         epg.loadGuide('#menu', currentChannelIdx);
 
         $('#menu_spacer').show(); 
@@ -104,7 +106,7 @@ $(function () {
         if ((active_id === 0 && direction < 0) || (active_id === channels.size()-1 && direction > 0)) {
             return;
         }
-		var next_id = active_id + direction;
+		var next_id = active_id + direction;    
 
         setActiveMenuElement(next_id);
     }

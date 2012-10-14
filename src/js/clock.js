@@ -4,7 +4,7 @@
  * @author Jakob Hilarius, http://syscall.dk
  */
 function Clock() {
-
+	
 }
 
 Clock.prototype.show = function() {
