@@ -19,16 +19,13 @@ $(function () {
     boxeeAPI.keyboardMode();
 
     var channels = new Channels();
-
-	// The channel we are currently viewing
-    // TODO: Move to Player
-    var currentChannelIdx = 0;
+    
     // The channel selected in the EPG
     var activeIdx = 0;
 
 	var clock = new Clock();
-	var watcher = new Watcher();
-	var epg = new Epg(watcher);
+	var watcher = new Watcher(); // TODO: Move watcher refs to player
+	var epg = new Epg();
     var player = new Player(watcher);
     var favorites = new Favorites();
     var vod = new VOD(player, favorites);
@@ -48,16 +45,17 @@ $(function () {
     boxee.exec("setupPlayer()");
 
     function showGuide() {
-        setActiveMenuElement(currentChannelIdx);
+        player.getState(function (state) {
 
-        hideInfo();
+            hideInfo();
 
-        // TODO: This doesn't working correctly when coming from VOD since currentChannelIdx
-        // is set in the Player
-        epg.loadGuide('#menu', currentChannelIdx);
+            epg.loadGuide('#menu', state.currentChannelIdx);
+            // TODO: Do in callback from loadGuide
+            watcher.loadWatcherCount('#menu', state.currentChannelIdx);
 
-        $('#menu_spacer').show(); 
-        $('#menu').show();
+            $('#menu_spacer').show(); 
+            $('#menu').show();
+        });
     }
     function hideGuide() {
         $('#menu_spacer').hide();
@@ -77,21 +75,20 @@ $(function () {
 
     function changeChannel() {
         // Only change channel if it has actually changed
-        if (currentChannelIdx === activeIdx) {
-            return;
-        }
+        player.getState(function(state) {
+            if (state.currentChannelIdx === activeIdx) {
+                return;
+            }
 
-        var activeElement = $('.active')[0];
-        var idx = activeElement.id;
+            var activeElement = $('.active')[0];
+            var idx = parseInt(activeElement.id, 10);
+
+            var channel = channels.getCleanName(idx);
         
-
-        currentChannelIdx = idx;
-
-        var channel = channels.getCleanName(idx);
-        
-        player.play({
-            'channel': channel, 
-            'idx': idx
+            player.play({
+                'channel': channel, 
+                'idx': idx
+            }); 
         });
     }
     
@@ -203,10 +200,12 @@ $(function () {
             moveSelection(-1);
         }
         else {
-            setActiveMenuElement(currentChannelIdx);
+            player.getState(function (state) {
+                setActiveMenuElement(state.currentChannelIdx);
             
-            showInfo();
-            clock.show();
+                showInfo();
+                clock.show();
+            });
         }
     }
 

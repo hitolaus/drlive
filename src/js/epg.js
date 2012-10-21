@@ -3,14 +3,13 @@
  *
  * @author Jakob Hilarius, http://syscall.dk
  */
-function Epg(watcher) {
+function Epg() {
     // Register last epg load time to minimize EPG calls
     this.EPG_UPDATE_INTERVAL_IN_MILLIS = 30000; 
     
     this.lastEpgUpdate = 0;
     
     this.channels = new Channels();
-    this.watcher = watcher;
 }
 
 /**
@@ -36,7 +35,7 @@ Epg.prototype.loadGuide = function(elementId, currentChannelIdx) {
 		var end   = new Date(start.getTime() + 3600000);
 
 		$(elementId).append('<div id="title">'+start.getFormattedHour()+' - ' + end.getFormattedHour() + '</div>');
-		
+
 		var channels = data.channels;
 		for (var i = 0; i < channels.length; i++) {
 			var channel = channels[i];
@@ -58,9 +57,6 @@ Epg.prototype.loadGuide = function(elementId, currentChannelIdx) {
 		}
 
 		scope.lastEpgUpdate = new Date().getTime();
-		
-		// TODO: Remove?
-		scope.watcher.loadWatcherCount(elementId, currentChannelIdx);
 	}).error(function() {
 		$(elementId).empty();
 		$(elementId).append('<div id="error">Problem med TV guiden!</div>');
