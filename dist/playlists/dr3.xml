@@ -1,45 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <playlist version="1" xmlns="http://xspf.org/ns/0/">
   <trackList>
-    <!--
     <track>
-      <title>DR HD</title>
-      <meta rel="description">Main stream - 1796 kb</meta>
-      <meta rel="file">livedr06astream3.flv</meta>
-      <meta rel="streamer">rtmp://livetv.gss.dr.dk/live/</meta>
-      <meta rel="type">rtmp</meta>
-    </track>
-    <track>
-      <title>DR HD</title>
-      <meta rel="description">Reservce - 1796 kb</meta>
-      <meta rel="file">livedr06bstream3.flv</meta>
-      <meta rel="streamer">rtmp://livetv.gss.dr.dk/live/</meta>
-      <meta rel="type">rtmp</meta>
-    </track>
-    -->
-    <track>
-       <title>DR HD</title>
+       <title>DR3</title>
        <meta rel="description">Main Stream - 1096 kb</meta>
        <meta rel="file">livedr06astream2.flv</meta>
        <meta rel="streamer">rtmp://livetv.gss.dr.dk/live/</meta>
        <meta rel="type">rtmp</meta>
      </track>
     <track>
-      <title>DR HD</title>
+      <title>DR3</title>
       <meta rel="description">Reserve - 1096 kb</meta>
       <meta rel="file">livedr06bstream2.flv</meta>
       <meta rel="streamer">rtmp://livetv.gss.dr.dk/live/</meta>
       <meta rel="type">rtmp</meta>
     </track>
     <track>
-      <title>DR HD</title>
+      <title>DR3</title>
       <meta rel="description">Main Stream - 596 kb</meta>
       <meta rel="file">livedr06astream1.flv</meta>
       <meta rel="streamer">rtmp://livetv.gss.dr.dk/live/</meta>
       <meta rel="type">rtmp</meta>
     </track>
     <track>
-      <title>DR HD</title>
+      <title>DR3</title>
       <meta rel="description">Reserve - 596 kb</meta>
       <meta rel="file">livedr06bstream1.flv</meta>
       <meta rel="streamer">rtmp://livetv.gss.dr.dk/live/</meta>

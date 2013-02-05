@@ -28,7 +28,8 @@ Epg.prototype.loadGuide = function(elementId, currentChannelIdx) {
 	// Register scope for the callback function
     var scope = this;
     
-	$.getJSON('http://www.dr.dk/nu/api/nownext?ts='+now+'&callback=?', function(data) {
+	//$.getJSON('http://www.dr.dk/nu/api/nownext?ts='+now+'&callback=?', function(data) {
+    $.getJSON('api/epg.php?ts='+now, function(data) {
 		$(elementId).empty();
 		
 		var start = new Date();
