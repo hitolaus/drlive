@@ -2,6 +2,9 @@
  * The VOD video list and menu.
  *
  * @author Jakob Hilarius, http://syscall.dk
+ *
+ * @param {Player} player The player object
+ * @param {Favorites} favorites The favorites service
  */
 function VOD(player, favorites) {
 	var currentPaginationIdx = 0,
@@ -18,9 +21,9 @@ function VOD(player, favorites) {
 			if (cmdElement === null || cmdElement.length === 0) {
 				return;
 			}
-		
+
 			var cmd = cmdElement.html();
-			
+
 			api = 'api/'+cmd+'.php?ts='+new Date().getTime();
 		}
 		else {
@@ -42,7 +45,7 @@ function VOD(player, favorites) {
 		if (len === 0) {
 			grid.append('<div class="error">Ingen videoer fundet</div>');
 		}
-			
+
 		for (var i = 0; i < len; i++) {
 			var r = data[i];
 
@@ -66,14 +69,15 @@ function VOD(player, favorites) {
 
 				slug = r.programSerieSlug;
 			}
-			/*
+
+            // Add favorites mark
 			var favMark = $('<div class="favorite"><img src="images/buttons/graphic-check-54px.png" alt="" /></div>');
-			
+
 			if (!favorites.isFavorite(title, slug)) {
 				favMark.hide();
 			}
 			video.append(favMark);
-			*/
+
 			video.append(thumb);
 			video.append('<h1>'+r.title+'</h1>');
 			if (r.id !== undefined) {
@@ -88,7 +92,7 @@ function VOD(player, favorites) {
 				// Load visible thumbs
 				new Image().load(thumb);
 			}
-			
+
 			grid.append(video);
 		}
 
@@ -105,13 +109,13 @@ function VOD(player, favorites) {
 
 		var menu = $('<div id="vod-menu" />');
 		menu.append('<h1>DR NU MENU</h1>');
-		
+
 		var menu_elements = $('<ul />');
 		menu_elements.append('<li>Nyeste<span class="cmd hidden">newest</span></li>');
 		menu_elements.append('<li>Mest Populære<span class="cmd hidden">mostviewed</span></li>');
 		menu_elements.append('<li>Favoritter<span class="cmd hidden">favorites</span></li>');
 		menu_elements.append('<li>Alle Programmer<span class="cmd hidden">programs</span></li>');
-		
+
 		menu.append(menu_elements);
 
 		videos.append(menu);
@@ -124,7 +128,7 @@ function VOD(player, favorites) {
 		videos.append(container);
 
 		$('body').append(videos);
-		
+
 		setTimeout(function() {
 			$('#videos').css('top', '0');
 		}, 0);
@@ -160,7 +164,7 @@ function VOD(player, favorites) {
         var videos = $('#vod-grid').children();
         for (var i = 0; i < videos.length; i++) {
             var video = $(videos[i]);
-            
+
             if (video.hasClass('selected')) {
                 if (i === 0 && direction < 0) {
                     return;
@@ -199,7 +203,7 @@ function VOD(player, favorites) {
                 video.removeClass('selected');
                 $(videos[delta]).addClass('selected');
                 // Selected index in the visible 4x3 view
-                currentSelectedVideoIdx = delta - currentPaginationIdx; 
+                currentSelectedVideoIdx = delta - currentPaginationIdx;
                 break;
             }
         }
@@ -209,7 +213,7 @@ function VOD(player, favorites) {
         var videos = $('#vod-menu ul').children();
         for (var i = 0; i < videos.length; i++) {
             var video = $(videos[i]);
-            
+
             if (video.hasClass('selected')) {
                 if (i === 0 && direction < 0) {
                     return;
@@ -239,8 +243,8 @@ function VOD(player, favorites) {
 
 	this.hide = function () {
 		// Move offscreen
-		$('#videos').css('top', '720px');	
-		
+		$('#videos').css('top', '720px');
+
 		// Remove only after the CSS3 transision is complete
 		setTimeout(function() {
 			$('#videos').hide();
@@ -251,7 +255,7 @@ function VOD(player, favorites) {
 
 /*
 	this.show = function () {
-		$('#videos').css('top', '0');	
+		$('#videos').css('top', '0');
 	};
 */
 
@@ -294,7 +298,7 @@ function VOD(player, favorites) {
 			activateMenu();
 		}
 		else {
-			moveVideoSelection(-1);	
+			moveVideoSelection(-1);
 		}
 	};
 
@@ -331,4 +335,12 @@ function VOD(player, favorites) {
 			this.hide();
 		}
 	};
+
+    this.play = function () {
+        if (menuActive) {
+            return;
+        }
+
+        favorites.toggleFavorite();
+    };
 }

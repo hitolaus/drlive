@@ -1,6 +1,6 @@
 // Setup globals for all AJAX requests
 $.ajaxSetup({ timeout: 10000 });
-    
+
 var dialog = {
   showQuitDialog: function() {
 	boxeeAPI.promptDialog("Afslut?", "Er du sikker på, at du vil afslutte DR Live TV?", function(confirmed) {
@@ -9,7 +9,7 @@ var dialog = {
 		}
 	});
   }
-};    
+};
 
 if (!window.console) {
     console = {};
@@ -19,7 +19,7 @@ $(function () {
     boxeeAPI.keyboardMode();
 
     var channels = new Channels();
-    
+
     // The channel selected in the EPG
     var activeIdx = 0;
 
@@ -37,6 +37,9 @@ $(function () {
         boxee.onKeyboardKeyDown  = function() {browser.keyPress(browser.KEY_DOWN);};
         boxee.onKeyboardKeyEnter = function() {browser.keyPress(browser.KEY_RETURN);};
         boxee.onKeyboardKeyBack  = function() {browser.keyPress(browser.KEY_ESCAPE);};
+        boxee.onPlay = function() {browser.keyPress(browser.KEY_P);};
+        boxee.onPause = function() {browser.keyPress(browser.KEY_P);};
+        boxee.onUpdateState = function() { playerState.canPause = true; };
     }
 
     // Register in Control Context (see http://developer.boxee.tv/Control_Script_Context)
@@ -53,7 +56,7 @@ $(function () {
             // TODO: Do in callback from loadGuide
             watcher.loadWatcherCount('#menu', state.currentChannelIdx);
 
-            $('#menu_spacer').show(); 
+            $('#menu_spacer').show();
             $('#menu').show();
         });
     }
@@ -64,9 +67,9 @@ $(function () {
 
     function showInfo() {
         hideGuide();
-        
+
         epg.loadChannelInfo('#description', activeIdx);
-        
+
         $('#description').show();
     }
     function hideInfo() {
@@ -84,26 +87,26 @@ $(function () {
             var idx = parseInt(activeElement.id, 10);
 
             var channel = channels.getCleanName(idx);
-        
+
             player.play({
-                'channel': channel, 
+                'channel': channel,
                 'idx': idx
-            }); 
+            });
         });
     }
-    
-	
+
+
     function moveSelection(direction) {
         var active_elem = document.getElementsByClassName("active")[0];
         var active_id = -1;
         if (active_elem) {
             active_id = parseInt(active_elem.id, 10);
         }
-        
+
         if ((active_id === 0 && direction < 0) || (active_id === channels.size()-1 && direction > 0)) {
             return;
         }
-		var next_id = active_id + direction;    
+		var next_id = active_id + direction;
 
         setActiveMenuElement(next_id);
     }
@@ -139,6 +142,12 @@ $(function () {
         }
     }
 
+    function onPlay() {
+        if ($('#videos').is(":visible")) {
+            vod.play();
+        }
+    }
+
     function onBack() {
         if ($('#description').is(":visible")) {
             hideInfo();
@@ -154,7 +163,7 @@ $(function () {
         else {
             dialog.showQuitDialog();
         }
-        
+
     }
 
     function onRight() {
@@ -171,7 +180,7 @@ $(function () {
             player.next();
         }
     }
-   
+
     function onLeft() {
         if ($('#description').is(':visible')) {
             showGuide();
@@ -202,7 +211,7 @@ $(function () {
         else {
             player.getState(function (state) {
                 setActiveMenuElement(state.currentChannelIdx);
-            
+
                 showInfo();
                 clock.show();
             });
@@ -248,6 +257,9 @@ $(function () {
             break;
         case 40:
             onDown();
+            break;
+        case 80: // 'P'
+            onPlay();
             break;
         default:
             break;

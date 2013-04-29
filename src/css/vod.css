@@ -66,6 +66,7 @@
 }
 #vod-grid .video {
     float: left;
+    position: relative;
     padding-right: 20px;
     padding-bottom: 20px;
     min-height: 175px;
@@ -95,6 +96,17 @@
     border: 5px solid #222;
     border-radius: 5px;
 }
+#vod-grid .video .favorite {
+    position: absolute;
+    bottom: 50px;
+    right: 30px;
+}
+#vod-grid .video .favorite img {
+    border:0 !important;
+    width:24px;
+    height:24px;
+}
+
 #vod-grid .error {
 	color: #777;
     font-size: 32px;
